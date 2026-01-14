@@ -1,0 +1,322 @@
+######################
+# SIMULATION SETUP
+######################
+
+basenm     = "reaccretion_"
+log_file   = "reaccretion.log"
+
+gamma       = 1.6667
+
+# w = warm, c = cold; used in half of setups
+sim_gamma_w = 1.6667
+sim_gamma_c = 1.6667
+simaw =  -1 # 0.61 ## we have now a lot of setups which use these instead of sim_A_i and sim_A_n
+sim_Ac =  -1 # 1.27
+
+# i = ionised, n = neutral; used in other half of setups
+sim_gamma_i = 1.6667
+sim_gamma_n = 1.6667
+sim_A_i = -1 # = calculate by chemistry
+sim_A_n = -1 
+
+# initial chemical composition
+sim_init_H2 = 0.25        #1e-5
+sim_init_Hp = 0.25        #3e-6
+sim_init_CO = 0.
+# sim_init_Ha = 1.0 #not used, ionised=1-sim_init_Hp -2*sim_init_H2
+
+######################
+# Computational domain
+######################
+
+geometry = spherical
+
+# BOX COORDINATES
+xmin    =  0.0  # 0 pc
+xmax    =  1.6024993590528757e+20  # 51.93346734166428 pc
+ymin    = -3.0856776e+19
+ymax    =  3.0856776e+19
+zmin    = -3.0856776e+19
+zmax    =  3.0856776e+19
+
+# HYDRO BOUNDARY CONDITIONS
+xl_boundary_type      = "reflect"
+xr_boundary_type      = "diode"
+yl_boundary_type      = "reflect"
+yr_boundary_type      = "reflect"
+zl_boundary_type      = "reflect"
+zr_boundary_type      = "reflect"
+
+######################
+# Grid
+######################
+
+# ROOT BLOCKS (I.E. REFINEMENT LEVEL 1)
+nblockx = 1
+nblocky = 1
+nblockz = 1
+
+# INTERPOLATION ORDER FOR MONOTONIC INTERPOLATION
+interpol_order = 0 # or 1, 2 is not recommended as it has issues with mass conservation etc.
+
+# AMR REFINEMENT LIMITS
+lrefine_min = 11
+lrefine_max = 15
+nrefs       = 2 # time steps between refinememt checks
+
+# AMR REFINEMENT CONDITIONS: STANDARD FLASH LOEHNER'S CONDITION
+refine_var_1       = "none"
+derefine_cutoff_1  = 0.7
+refine_cutoff_1    = 0.9
+
+# SILCC Z-REFINEMENT RESTRICTIONS
+full_refine_zmin = -3.084e21
+full_refine_zmax =  3.084e21
+
+# AMR REFINEMENT CONDITIONS: GRAVITY AND SINKS
+refineOnJeansLength    = .true.
+refine_sinks           = .true.
+jeans_ncells_ref       =  8
+jeans_ncells_deref     = 16
+
+###############################
+# Hydro solver
+###############################
+
+# PPM PARAMS
+cfl         = 0.8
+nriem       = 1000
+eintSwitch  = 1.e-4
+irenorm     = 1 # not set by default
+
+# LIMITS APPLIED IN PPM AND OTHER SOLVERS
+smallt = 1.e-15
+smalle = 1.e-40
+smlrho = 1.e-40
+smallp = 1.e-20
+smallx = 1.e-50
+
+###############################
+## GRAVITY
+###############################
+
+useGravity           = .true.
+updateGravity        = .true.
+grv_usePoissonPotential  = .true.
+grv_useExternalPotential = .true.
+
+grv_bhNewton            = -1.0
+grv_bhMAC               = "ApproxPartialErr"
+grv_bhMPDegree          = 2
+grv_bhUseRelAccErr      = .true.
+grv_bhAccErr            = 0.01
+
+grav_unjunkPden         = .true.
+grav_boundary_type   = "isolated"
+grav_boundary_type_x = "isolated"
+grav_boundary_type_y = "isolated"
+grav_boundary_type_z = "isolated"
+
+grv_bhEwaldNPer           = 32
+grv_bhEwaldSeriesN        = 10
+grv_bhEwaldAlwaysGenerate = .true.
+grv_bhEwaldFName          = "ewald_field"
+
+# EXTERNAL POTENTIAL PARAMETERS
+grv_bhExtrnPotType      = "planez"
+grv_bhExtrnPotFile      = "external-potential-solnei.dat" # new external potential with dark matter contribution and solar neighborhood conditions
+grv_bhExtrnPotCenterX   = 0.0
+grv_bhExtrnPotCenterY   = 0.0
+grv_bhExtrnPotCenterZ   = 0.0
+
+#convertToConsvdForMeshCalls = .true.
+#convertToConsvdInMeshInterp = .false.
+
+# POINT MASS PARAMETERS
+ptmass = 0.0
+ptxpos = 0.0
+ptypos = 0.0
+ptzpos = 0.0
+
+####################################
+# LIMITERS
+####################################
+
+lim_minDens               = 1.0e-29
+lim_maxVelm               = 5.0e9
+lim_minTemp               = 2.0
+lim_maxTemp               = 4.e8
+
+###############################
+# Cooling - Schure
+###############################
+
+useCool           = .true.
+co_abund_file     = ""
+co_computeDt	  = .false.
+co_ionDegInd      =  1
+co_muIon          =  1.2727
+co_metal          =  6.6090000000e-01
+co_T0             =  10.0
+co_rho0           =  1e-30
+co_sch09_file     =   "./cooltab-schure09"
+co_dmc72_file     =   "./cooltab-schure09-t4-dalgarno-mccray72"
+co_startTime      =  1.5778800000e+13
+
+###############################
+## Raccretion
+################################
+
+useReaccretion   = .true.
+reacc_rholow     = 1.e-27
+reacc_rad        = 5.42404265625e+18  # 5 cells at rl5 and xmax 45pc
+reacc_starttime  = 124386268528800.0  # 3941563.0 Myr
+
+###############################
+### Heat conduction
+#################################
+
+useDiffuse = .true.
+useDiffuseTherm = .true.
+useDiffuseVisc = .false.
+useConductivity  =  .true.
+diff_useEleCond = .false.
+diff_useIonCond = .false.
+dt_diff_factor = 0.8
+usediffusecomputedtspecies  =  F
+usediffusecomputedttherm    =  F
+usediffusecomputedtvisc     =  F
+usediffusecomputedtmagnetic =  F
+diff_eleXlBoundaryType = "neumann"
+diff_eleXrBoundaryType = "neumann"
+diff_eleYlBoundaryType = "neumann"
+diff_eleYrBoundaryType = "neumann"
+diff_eleZlBoundaryType = "neumann"
+diff_eleZrBoundaryType = "neumann"
+diff_eleFlMode = "fl_harmonic"
+diff_eleFlCoef = 1.5
+diff_thetaImplct = 1.0
+
+# Spitzer power-law conductivity
+cond_TemperatureExponent = 2.5
+cond_DensityExponent = 0.0
+cond_K0 = 6.0e-7
+
+# HECTOR
+useHector = .false.
+hec_updateMass = .true.
+hec_updateEner = .true.
+hec_TLlim = 3e4
+hec_gradLim = 1.0
+hec_cdtabfile = "cdTab"
+
+###############################
+# Wind
+###############################
+
+useWind  = .true.
+wi_wevolfile     = "wind_m060"
+wi_computeDt     = .true.
+wi_tini          = 0.0
+wi_smoothfile    = ""
+wi_srcfile       = ""
+wi_snfile        = ""
+wi_wcn           = 0.25
+wi_dt_wihdr      = 0.9
+wi_nsub          = 4
+wi_profile       = "beta"
+wi_Rcut          = 0.0
+wi_Rcore         = 0.0
+wi_beta          = 1.5
+wi_LSC           = 0.0
+wi_vinf          = 0.0
+wi_etahe         = 1.0
+wi_etaml         = 0.0
+wi_noise         = 0.0
+wi_seed          = 1
+wi_tch17         = .true.
+wi_tchn          = 2
+wi_tchw          = 0.33333333
+
+####################################
+# ON THE SPOT 1D
+####################################
+
+useOnTheSpot1d = T
+
+####################################
+# OUTPUT PARAMETERS
+####################################
+
+plot_var_1  = "dens"
+plot_var_2  = "pres"
+plot_var_3  = "temp"
+plot_var_4  = "velx"
+plot_var_5  = "vely"
+plot_var_6  = "velz"
+plot_var_7  = "eint"
+plot_var_8  = "ener"
+plot_var_9  = "fism"
+plot_var_10 = "fwi"
+plot_var_11 = "fsn"
+
+###########################################
+# SIMULATION AND PHYSICAL TIME PARAMETERS
+###########################################
+
+# PHYSICAL AND WALL CLOCK END TIME
+tmax   = 124196922928800  # 3.935563 Myr
+nend   = 99999999
+wall_clock_time_limit = 85860 # 23h 51m
+
+# WALL CLOCK TIME BETWEEN CHECKPOINTS
+wall_clock_checkpoint       = 85800 # 23h 50m
+
+# PHYSICAL TIME BETWEEN OUTPUTS
+checkpointFileIntervalTime  = 124196922928800  # 3.935563 Myr
+plotFileIntervalTime        = 12419692292880  # 393.55629999999996 kyr
+particleFileIntervalTime    = 0.0
+
+# NUMBER OF TIME STEPS BETWEN OUTPUTS
+checkpointFileIntervalStep  = 0
+plotFileIntervalStep        = 0
+particleFileIntervalStep    = 0
+
+# RESTART
+restart = F
+restart_withoutParticles  = .false.
+#restart_from_false = .false.
+
+# RESTART FILE NUMBERS
+checkpointFileNumber  = 0
+plotFileNumber        = 0
+particleFileNumber    = 0
+
+# INITIAL, MINIMUM AND MAXIMUM TIME STEP
+dtinit = 3.1556926e+8  # 10 yr
+dtmin  = 1.e4    
+dtmax  = 1.5778476e+10 # 0.5 kyr
+
+###########################################
+# RADPROF
+###########################################
+
+# centre of the radial profile, radprof file
+sim_xCenter       =    0.0
+sim_yCenter       =    0.0
+sim_zCenter       =    0.0
+sim_vx            =    0.0e0
+sim_vy            =    0.0e0
+sim_vz            =    0.0e0
+sim_nSubZones     = 2
+sim_nProfile      = 2
+sim_Nre           = 2
+sim_radprof_file  = "rtpsym.init"
+sim_refevol_file  = ""
+
+# perturbations
+sim_pertType      =    2
+sim_pertamp       =    0.0
+sim_velamp        =    0.0
+sim_spharm_l1     =    12
+sim_spharm_m1     =    6
